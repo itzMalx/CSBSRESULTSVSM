@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login to Result Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('abstract-blur-defocused-bookshelf-library.jpg'); /* Replace 'your-image-url.jpg' with the actual URL of your background image */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            
+        }
+        .department {
+            font-size: 45px;
+            
+            font-weight:400;
+            margin-bottom: 40px;
+            text-align: center;
+            color: rgb(0, 0, 0);
+            text-shadow: 3px 2px 20px rgba(0, 0, 0, 0.984);
+        }
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            width: 90%;
+            max-width: 400px;
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .login-container input[type="text"], .login-container input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #000000;
+            border: none;
+            color: white;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .login-container button:hover {
+            background-color: #f70101;
+        }
+        @media (max-width: 600px) {
+            .login-container {
+                padding: 15px;
+                width: 100%;
+            }
+            .login-container input[type="text"], .login-container input[type="password"] {
+                padding: 12px;
+                margin: 8px 0;
+            }
+            .login-container button {
+                padding: 12px;
+            }
+            .department {
+                font-size: 24px;
+                margin-top: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="department">DEPARTMENT OF COMPUTER SCIENCE AND BUSINESS SYSTEMS</div>
+    <div class="department">RESULT PORTAL</div>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form onsubmit="login(); return false;" autocomplete="off">
+            <input type="text" id="username" placeholder="Enter your username (e.g., 611222244001)" autocomplete="off">
+            <input type="password" id="password" placeholder="Enter your password" autocomplete="off">
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <script>
+        const validUsernames = [];
+        const check = "CSBS";
+        for (let i = 1; i <= 59; i++) {
+            validUsernames.push('6112222440' + (i < 10 ? '0' + i : i.toString()));
+        }
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (validUsernames.includes(username) && password === check) {
+                localStorage.setItem('username', username);
+                localStorage.setItem('password', password);
+                window.location.href = 'result.html';
+            } else {
+                alert('Invalid username or password!');
+            }
+        }
+
+        console.log(`Screen width is ${window.innerWidth}px`);  // Log screen width to verify media query
+    </script>
+</body>
+</html>

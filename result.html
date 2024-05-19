@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('16406299_rm373batch2-08.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            margin: 100px;
+            margin-top: 50px;
+            width: 90%;
+            max-width: 800px; /* Adjust max-width as needed */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 50px auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border: 3px solid #000000;
+        }
+        th {
+            background-color: #0015ff;
+            color: rgb(255, 255, 255);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #e0e0e0;
+        }
+        tr:nth-child(odd) {
+            background-color: #fff;
+        }
+        .table-header {
+            background-color: #FF6F61;
+            color: white;
+        }
+        .table-footer {
+            background-color: #333;
+            color: white;
+        }
+        /* Media Queries for Mobile Devices */
+        @media (max-width: 768px) {
+            body {
+                height: auto;
+                justify-content: flex-start;
+            }
+            .container {
+                margin-top: 20px;
+                width: 100%;
+                max-width: none; /* Adjust for full width on smaller screens */
+                border-radius: 0;
+            }
+            table {
+                margin: 20px 0;
+            }
+            th, td {
+                padding: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            th, td {
+                padding: 8px;
+                font-size: 14px;
+            }
+        }
+        .print-button {
+            margin: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #0015ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .print-button:hover {
+            background-color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="color: #e0e0e0;">DEPARTMENT OF COMPUTER SCIENCE AND BUSINESS SYSTEMS</h1>
+        <h2 style="color: wheat;">Student Grade</h2>
+        <table id="resultsTable">
+            <thead class="table-header">
+                <tr id="subjectsRow"></tr>
+            </thead>
+            <tbody>
+                <tr id="gradesRow"></tr>
+            </tbody>
+        </table>
+        <button class="print-button" onclick="downloadPDF()">Download Your Results</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.14/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const username = localStorage.getItem('username');
+            const password = localStorage.getItem('password');
+            if (!username || !password) {
+                alert('You are not logged in!');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const userIndex = parseInt(username.slice(-2), 10);
+            if (userIndex < 1 || userIndex > 59) {
+                alert('Invalid username!');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZk9wExY5WlKpI_aQ8w3mBUQCiATxeZfDq1yleB6d0FIUl8mF2Kd0Ze7xPIsctt2H7dtOxqaSJzyNI/pub?output=csv';
+
+            fetch(sheetUrl)
+                .then(response => response.text())
+                .then(data => {
+                    const rows = data.split('\n');
+                    const subjects = rows[0].split(',');
+                    const userGrades = rows[userIndex + 1].split(',');
+
+                    const subjectsRow = document.getElementById('subjectsRow');
+                    const gradesRow = document.getElementById('gradesRow');
+
+                    subjects.forEach(subject => {
+                        const th = document.createElement('th');
+                        th.textContent = subject;
+                        subjectsRow.appendChild(th);
+                    });
+
+                    userGrades.forEach(grade => {
+                        const td = document.createElement('td');
+                        td.textContent = grade;
+                        gradesRow.appendChild(td);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    alert('Failed to fetch data. Please try again later.');
+                });
+        });
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape', 'mm', 'a1');
+
+            // Set custom margins to account for the table header
+            doc.setProperties({
+                margin: [40, 30, 50, 20]
+            });
+
+            // Add department and student grade text
+            const departmentText = 'DEPARTMENT OF COMPUTER SCIENCE AND BUSINESS SYSTEMS';
+            const gradeText = 'Student Grade';
+
+            doc.setFontSize(20);
+            doc.setTextColor('#000000');
+            doc.text(departmentText, 105, 15, { align: 'center' });
+            doc.setTextColor('#000000');
+            doc.text(gradeText, 105, 25, { align: 'center' });
+
+            doc.autoTable({
+                html: '#resultsTable',
+                startY: 40,
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [76, 175, 80],
+                    textColor: 255,
+                    halign: 'center'
+                },
+                bodyStyles: {
+                    halign: 'center'
+                },
+                columnStyles: {
+                    0: { cellWidth: 'auto' }, // Set the first column width to 'auto' for auto-sizing
+                },
+                styles: {
+                    overflow: 'linebreak',
+                    cellPadding: 3,
+                    fontSize: 10
+                }
+            });
+
+            // Set document size to A3
+            const pageSize = doc.internal.pageSize;
+            const pageWidth = pageSize.width;
+            const pageHeight = pageSize.height;
+            const contentHeight = doc.autoTable.previous.finalY + 10; // Final Y position of the table + padding
+
+            // Check if content height exceeds page height
+            if (contentHeight > pageHeight) {
+                doc.addPage();
+            }
+
+            doc.save('result.pdf');
+        }
+    </script>
+</body>
+</html>
